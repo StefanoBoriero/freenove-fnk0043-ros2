@@ -12,12 +12,29 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-# uncomment the following section in order to fill in
+find_path(pigpio_INCLUDE_DIR 
+	NAMES pigpio.h pigpiod_if.h pigpiod_if2.h
+	HINTS /usr/local/include)
+	
+    
+# Set the pigpio variables to plural form to make them accessible for 
+# the paramount cmake modules.
+set(pigpio_INCLUDE_DIRS ${pigpio_INCLUDE_DIR})
+set(pigpio_INCLUDES     ${pigpio_INCLUDE_DIR})
+
+# Handle REQUIRED, QUIET, and version arguments 
+# and set the <packagename>_FOUND variable.
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(pigpio 
+    DEFAULT_MSG 
+    pigpio_INCLUDE_DIR pigpio_LIBRARY pigpiod_if_LIBRARY pigpiod_if2_LIBRARY)
+
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
 add_executable(blinker src/blinker.cpp)
 target_compile_features(blinker PRIVATE cxx_std_17)
+target_link_libraries(blinker pigpiod_if2)
 ament_target_dependencies(blinker rclcpp)
 #target_include_directories(blinker PUBLIC
 #  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
